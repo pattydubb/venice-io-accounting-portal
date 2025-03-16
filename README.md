@@ -9,7 +9,7 @@ A central hub for accessing Venice.io accounting applications and services.
 - Simple application cards with status indicators
 - Easy setup for adding new applications
 - Responsive design for all devices
-- Airtable integration for managing applications (optional)
+- Optional Airtable integration for managing applications dynamically
 
 ## Tech Stack
 
@@ -17,14 +17,17 @@ A central hub for accessing Venice.io accounting applications and services.
 - TypeScript
 - TailwindCSS
 - Clerk Authentication
-- Airtable for lightweight data storage (optional)
+- Airtable for lightweight data storage (completely optional)
 
 ## Getting Started
 
 1. Clone this repository
 2. Install dependencies with `npm install`
-3. Copy `.env.example` to `.env.local` and verify the Clerk API keys are there
+3. Copy `.env.example` to `.env.local` with the Clerk API keys already populated
 4. Run the development server with `npm run dev`
+5. Access the portal at http://localhost:3000
+
+The application is already set up with your Clerk authentication credentials, so it will work out of the box with authentication. You don't need to set up Airtable to get started - the portal will use built-in default applications automatically.
 
 ## Authentication
 
@@ -71,7 +74,35 @@ CLERK_SECRET_KEY=sk_test_8aWOrN36s2zK0UkuAI362uDSF21NeQh7mBIaSqHhC7
 
 There are two ways to add applications to the Venice.io portal:
 
-### 1. Using Airtable (Recommended)
+### 1. Direct Code Editing (Recommended for Getting Started)
+
+The simplest way to add applications is to edit the `defaultApplications` array in `src/utils/applications.ts`:
+
+```typescript
+const defaultApplications: Application[] = [
+  {
+    id: 'recked',
+    name: 'RecKed',
+    description: 'Automatic bank reconciliation tool',
+    url: 'https://recked.venice.io',
+    status: 'Active',
+    category: 'Reconciliation',
+  },
+  // Add more applications here
+  {
+    id: 'your-app-id',
+    name: 'Your App Name',
+    description: 'App description',
+    url: 'https://app.venice.io',
+    status: 'Active', // or 'Coming Soon' or 'Maintenance'
+    category: 'Your Category',
+  },
+];
+```
+
+### 2. Using Airtable (Optional - for Dynamic Management)
+
+If you want to manage applications without modifying code, you can set up Airtable:
 
 1. Set up an Airtable base with the following structure:
    - Table name: `Applications`
@@ -83,29 +114,17 @@ There are two ways to add applications to the Venice.io portal:
      - `Category` (Single line text)
      - `Icon` (Single line text, optional)
 
-2. Configure your Airtable API key and base ID in the settings page or directly in your `.env.local` file:
+2. Get your Airtable API key and Base ID
+
+3. Add them to your `.env.local` file:
    ```
    AIRTABLE_API_KEY=key...
    AIRTABLE_BASE_ID=app...
    ```
 
-### 2. Direct Code Editing
+4. Or enter them in the Settings page in the portal
 
-Edit the `utils/applications.ts` file to modify the `defaultApplications` array:
-
-```typescript
-const defaultApplications: Application[] = [
-  {
-    id: 'app-id',
-    name: 'Application Name',
-    description: 'Application description',
-    url: 'https://app.venice.io',
-    status: 'Active', // or 'Coming Soon' or 'Maintenance'
-    category: 'Category',
-  },
-  // Add more applications here
-];
-```
+This is completely optional - the portal will work perfectly fine without Airtable by using the default applications.
 
 ## Clerk Authentication Settings
 
