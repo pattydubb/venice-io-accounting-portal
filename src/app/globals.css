@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-venice-light text-gray-800;
+}
+
+.app-card {
+  @apply bg-white rounded-xl shadow-md p-6 border border-gray-200 
+         hover:shadow-lg transition-all duration-200 
+         hover:border-venice-teal flex flex-col h-full;
+}
+
+.app-card-coming-soon {
+  @apply opacity-75;
+}
+
+.app-card-maintenance {
+  @apply bg-gray-50;
+}
+
+.btn-primary {
+  @apply bg-venice-blue hover:bg-blue-800 text-white py-2 px-4 
+         rounded-md transition-colors duration-200;
+}
+
+.btn-secondary {
+  @apply bg-venice-teal hover:bg-teal-700 text-white py-2 px-4
+         rounded-md transition-colors duration-200;
+}
+
+.btn-outline {
+  @apply border border-venice-blue text-venice-blue hover:bg-venice-blue 
+         hover:text-white py-2 px-4 rounded-md transition-colors duration-200;
+}
+
+.nav-link {
+  @apply text-gray-600 hover:text-venice-blue transition-colors px-4 py-2 rounded-md;
+}
+
+.nav-link-active {
+  @apply text-venice-blue font-medium;
+}
