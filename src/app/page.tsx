@@ -1,7 +1,11 @@
 import Link from 'next/link';
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
+import { auth } from '@clerk/nextjs';
 
 export default function Home() {
+  const { userId } = auth();
+  const isAuthenticated = !!userId;
+
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header */}
@@ -11,9 +15,15 @@ export default function Home() {
             <h1 className="text-2xl font-bold text-venice-blue">Venice.io</h1>
           </div>
           <div>
-            <Link href="/dashboard" className="btn-primary flex items-center">
-              Go to Dashboard <ArrowRightIcon className="w-4 h-4 ml-2" />
-            </Link>
+            {isAuthenticated ? (
+              <Link href="/dashboard" className="btn-primary flex items-center">
+                Go to Dashboard <ArrowRightIcon className="w-4 h-4 ml-2" />
+              </Link>
+            ) : (
+              <Link href="/sign-in" className="btn-primary flex items-center">
+                Sign In <ArrowRightIcon className="w-4 h-4 ml-2" />
+              </Link>
+            )}
           </div>
         </div>
       </header>
@@ -30,9 +40,15 @@ export default function Home() {
                 Your central hub for accessing Venice.io accounting applications and tools that transform financial chaos into clarity.
               </p>
               <div className="mt-10 flex space-x-4">
-                <Link href="/dashboard" className="btn-primary">
-                  Access Applications
-                </Link>
+                {isAuthenticated ? (
+                  <Link href="/dashboard" className="btn-primary">
+                    Access Applications
+                  </Link>
+                ) : (
+                  <Link href="/sign-in" className="btn-primary">
+                    Sign In
+                  </Link>
+                )}
                 <a href="#features" className="btn-outline">
                   Learn More
                 </a>
