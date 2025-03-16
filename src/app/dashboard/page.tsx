@@ -1,11 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
-import { ArrowRightIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { PlusIcon } from '@heroicons/react/24/outline';
+import AppCard, { Application } from '@/components/AppCard';
 
-// Example application structure - this would come from Airtable in production
-const exampleApp = {
+// Example application - this would come from Airtable in production
+const exampleApp: Application = {
   id: 'recked',
   name: 'RecKed',
   description: 'Automatic bank reconciliation tool that matches transactions',
@@ -34,39 +34,8 @@ export default function Dashboard() {
 
       <div className="mt-8">
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {/* Example application card */}
-          <div className="app-card">
-            <div className="rounded-full bg-venice-blue/10 p-2 text-venice-blue w-fit">
-              <svg 
-                xmlns="http://www.w3.org/2000/svg" 
-                fill="none" 
-                viewBox="0 0 24 24" 
-                strokeWidth={1.5} 
-                stroke="currentColor" 
-                className="w-6 h-6"
-              >
-                <path 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round" 
-                  d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" 
-                />
-              </svg>
-            </div>
-            <h3 className="mt-4 text-lg font-medium text-gray-900">{exampleApp.name}</h3>
-            <p className="mt-2 text-sm text-gray-500 flex-grow">{exampleApp.description}</p>
-            <div className="mt-5 flex items-center justify-between">
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                {exampleApp.status}
-              </span>
-              <Link
-                href={exampleApp.url}
-                target="_blank"
-                className="text-venice-blue hover:text-venice-teal inline-flex items-center text-sm font-medium"
-              >
-                Open <ArrowRightIcon className="ml-1 h-4 w-4" />
-              </Link>
-            </div>
-          </div>
+          {/* Example application card using our new component */}
+          <AppCard app={exampleApp} />
 
           {/* "Add Application" card */}
           <div className="app-card border-dashed flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50" onClick={() => setShowAddModal(true)}>
@@ -91,17 +60,40 @@ export default function Dashboard() {
             <p className="text-sm text-gray-500">
               Configure your Airtable base with an "Applications" table to dynamically manage applications.
             </p>
+            <pre className="mt-2 bg-gray-50 p-2 rounded text-xs overflow-auto">
+{`// Expected Airtable structure:
+{
+  "Name": "App Name",
+  "Description": "App description",
+  "URL": "https://app.venice.io",
+  "Status": "Active", // or "Coming Soon" or "Maintenance"
+  "Category": "Category"
+}`}
+            </pre>
           </div>
           <div className="bg-white p-4 rounded-md shadow-sm">
             <h3 className="font-medium text-gray-700 mb-2">Option 2: Direct Code Editing</h3>
             <p className="text-sm text-gray-500">
               Modify the applications array in the dashboard component for a code-based approach.
             </p>
+            <pre className="mt-2 bg-gray-50 p-2 rounded text-xs overflow-auto">
+{`// Add to apps array:
+const apps = [
+  {
+    id: "app-id",
+    name: "App Name",
+    description: "Description",
+    url: "https://app.venice.io",
+    status: "Active",
+    category: "Category"
+  }
+];`}
+            </pre>
           </div>
         </div>
       </div>
       
-      {/* Basic modal for adding applications - would be expanded with actual functionality */}
+      {/* Basic modal for adding applications */}
       {showAddModal && (
         <div className="fixed z-10 inset-0 overflow-y-auto">
           <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
@@ -113,27 +105,97 @@ export default function Dashboard() {
                 <div className="mt-3 text-center sm:mt-5">
                   <h3 className="text-lg leading-6 font-medium text-gray-900">Add Application</h3>
                   <div className="mt-6">
-                    <p className="text-sm text-gray-500 text-left">
-                      To add an application, you would:
-                    </p>
-                    <ul className="mt-2 text-sm text-gray-500 text-left list-disc pl-5">
-                      <li>Configure your Airtable with application details</li>
-                      <li>Or modify the applications array in the code</li>
-                      <li>Each application needs a name, description, URL, and status</li>
-                    </ul>
-                    <p className="mt-4 text-sm text-gray-500 text-left">
-                      This modal is a placeholder that would contain a form for adding applications when the integration is set up.
-                    </p>
+                    <form className="space-y-4">
+                      <div className="text-left">
+                        <label htmlFor="app-name" className="block text-sm font-medium text-gray-700">
+                          Application Name
+                        </label>
+                        <input
+                          type="text"
+                          name="app-name"
+                          id="app-name"
+                          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-venice-blue focus:border-venice-blue sm:text-sm"
+                          placeholder="RecKed"
+                        />
+                      </div>
+                      
+                      <div className="text-left">
+                        <label htmlFor="app-description" className="block text-sm font-medium text-gray-700">
+                          Description
+                        </label>
+                        <textarea
+                          name="app-description"
+                          id="app-description"
+                          rows={3}
+                          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-venice-blue focus:border-venice-blue sm:text-sm"
+                          placeholder="Describe what the application does"
+                        ></textarea>
+                      </div>
+                      
+                      <div className="text-left">
+                        <label htmlFor="app-url" className="block text-sm font-medium text-gray-700">
+                          Application URL
+                        </label>
+                        <input
+                          type="url"
+                          name="app-url"
+                          id="app-url"
+                          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-venice-blue focus:border-venice-blue sm:text-sm"
+                          placeholder="https://app.venice.io"
+                        />
+                      </div>
+                      
+                      <div className="text-left">
+                        <label htmlFor="app-status" className="block text-sm font-medium text-gray-700">
+                          Status
+                        </label>
+                        <select
+                          id="app-status"
+                          name="app-status"
+                          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-venice-blue focus:border-venice-blue sm:text-sm rounded-md"
+                        >
+                          <option value="Active">Active</option>
+                          <option value="Coming Soon">Coming Soon</option>
+                          <option value="Maintenance">Maintenance</option>
+                        </select>
+                      </div>
+                      
+                      <div className="text-left">
+                        <label htmlFor="app-category" className="block text-sm font-medium text-gray-700">
+                          Category
+                        </label>
+                        <input
+                          type="text"
+                          name="app-category"
+                          id="app-category"
+                          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-venice-blue focus:border-venice-blue sm:text-sm"
+                          placeholder="Reconciliation"
+                        />
+                      </div>
+                      
+                      <div className="text-xs text-gray-500 text-left mt-4">
+                        <p>
+                          This form is a placeholder. When integrated with Airtable, it would save the 
+                          application to your Airtable base.
+                        </p>
+                      </div>
+                    </form>
                   </div>
                 </div>
               </div>
-              <div className="mt-5 sm:mt-6">
+              <div className="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
                 <button
                   type="button"
-                  className="inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-venice-blue text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:text-sm"
+                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-venice-blue text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:col-start-2 sm:text-sm"
+                >
+                  Add Application
+                </button>
+                <button
+                  type="button"
+                  className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:col-start-1 sm:text-sm"
                   onClick={() => setShowAddModal(false)}
                 >
-                  Close
+                  Cancel
                 </button>
               </div>
             </div>
