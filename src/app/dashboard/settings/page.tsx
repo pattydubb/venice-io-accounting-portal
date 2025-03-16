@@ -1,12 +1,23 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function SettingsPage() {
   const [airtableApiKey, setAirtableApiKey] = useState('');
   const [airtableBaseId, setAirtableBaseId] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState({ text: '', type: '' });
+  const [isAirtableEnabled, setIsAirtableEnabled] = useState(false);
+
+  // Check if environment variables exist on component mount
+  useEffect(() => {
+    // This is a client-side check only for UX purposes
+    // The actual check happens server-side in the applications utility
+    const hasAirtableKey = localStorage.getItem('hasAirtableKey') === 'true';
+    const hasAirtableBaseId = localStorage.getItem('hasAirtableBaseId') === 'true';
+    
+    setIsAirtableEnabled(hasAirtableKey && hasAirtableBaseId);
+  }, []);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,7 +31,11 @@ export default function SettingsPage() {
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Here we would save the values to a secure location
-      console.log('Saving Airtable settings:', { airtableApiKey, airtableBaseId });
+      // For demonstration, we'll just save flags to local storage
+      localStorage.setItem('hasAirtableKey', airtableApiKey ? 'true' : 'false');
+      localStorage.setItem('hasAirtableBaseId', airtableBaseId ? 'true' : 'false');
+      
+      setIsAirtableEnabled(!!(airtableApiKey && airtableBaseId));
       
       setMessage({ 
         text: 'Settings saved successfully. Restart the application for changes to take effect.',
@@ -43,13 +58,22 @@ export default function SettingsPage() {
         
         <div className="bg-white shadow overflow-hidden sm:rounded-lg">
           <div className="px-4 py-5 sm:px-6">
-            <h3 className="text-lg leading-6 font-medium text-gray-900">Airtable Integration</h3>
+            <h3 className="text-lg leading-6 font-medium text-gray-900">Airtable Integration (Optional)</h3>
             <p className="mt-1 max-w-2xl text-sm text-gray-500">
-              Connect your Airtable base to manage applications dynamically.
+              Connect your Airtable base to manage applications dynamically. This is optional - if not configured, the portal will use default applications.
             </p>
           </div>
           
           <div className="border-t border-gray-200 px-4 py-5 sm:p-6">
+            <div className="mb-4 flex items-center">
+              <div className={`h-4 w-4 rounded-full mr-2 ${isAirtableEnabled ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+              <span className="text-sm font-medium">
+                {isAirtableEnabled 
+                  ? 'Airtable integration is enabled' 
+                  : 'Airtable integration is disabled (using default applications)'}
+              </span>
+            </div>
+            
             <form onSubmit={handleSave} className="space-y-6">
               <div>
                 <label htmlFor="airtable-api-key" className="block text-sm font-medium text-gray-700">
@@ -136,6 +160,21 @@ export default function SettingsPage() {
           </div>
           
           <div className="border-t border-gray-200 px-4 py-5 sm:p-6">
+            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <svg className="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm text-yellow-700">
+                    <strong>Note:</strong> Airtable integration is completely optional. If not configured, the portal will use built-in default applications.
+                  </p>
+                </div>
+              </div>
+            </div>
+            
             <h4 className="text-md font-medium text-gray-700 mb-2">Applications Table</h4>
             <div className="bg-gray-50 p-4 rounded overflow-auto">
               <pre className="text-xs text-gray-700">
@@ -162,20 +201,46 @@ Fields:
 - Theme (Single select: "light", "dark")`}
               </pre>
             </div>
+          </div>
+        </div>
+        
+        <div className="mt-8 bg-white shadow overflow-hidden sm:rounded-lg">
+          <div className="px-4 py-5 sm:px-6">
+            <h3 className="text-lg leading-6 font-medium text-gray-900">Alternative: Direct Code Editing</h3>
+            <p className="mt-1 max-w-2xl text-sm text-gray-500">
+              Instead of using Airtable, you can directly edit the code to add applications.
+            </p>
+          </div>
+          
+          <div className="border-t border-gray-200 px-4 py-5 sm:p-6">
+            <p className="text-sm text-gray-600 mb-4">
+              You can add applications directly by modifying the <code>defaultApplications</code> array in 
+              <code>src/utils/applications.ts</code>:
+            </p>
             
-            <div className="mt-6 bg-yellow-50 border-l-4 border-yellow-400 p-4">
-              <div className="flex">
-                <div className="flex-shrink-0">
-                  <svg className="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm text-yellow-700">
-                    Note: If you don't have an Airtable account, you can still use this portal by adding applications directly in the code. See the dashboard for more information.
-                  </p>
-                </div>
-              </div>
+            <div className="bg-gray-50 p-4 rounded overflow-auto">
+              <pre className="text-xs text-gray-700">
+{`// Edit this array to add your applications
+const defaultApplications: Application[] = [
+  {
+    id: 'recked',
+    name: 'RecKed',
+    description: 'Automatic bank reconciliation tool',
+    url: 'https://recked.venice.io',
+    status: 'Active',
+    category: 'Reconciliation',
+  },
+  // Add more applications here
+  {
+    id: 'your-app-id',
+    name: 'Your App Name',
+    description: 'App description',
+    url: 'https://app.venice.io',
+    status: 'Active', // or 'Coming Soon' or 'Maintenance'
+    category: 'Your Category',
+  },
+];`}
+              </pre>
             </div>
           </div>
         </div>
