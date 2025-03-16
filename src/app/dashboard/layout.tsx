@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 import { 
   Bars3Icon, 
@@ -7,10 +9,9 @@ import {
   ChartBarIcon,
   XMarkIcon 
 } from '@heroicons/react/24/outline';
-import { useState } from 'react';
-
-// This is a client component wrapper for the sidebar
-'use client';
+import { useState, useEffect } from 'react';
+import { useAuth, UserButton } from '@clerk/nextjs';
+import { useRouter } from 'next/navigation';
 
 export default function DashboardLayout({
   children,
@@ -18,6 +19,24 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { isLoaded, userId, isSignedIn } = useAuth();
+  const router = useRouter();
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (isLoaded && !isSignedIn) {
+      router.push('/sign-in');
+    }
+  }, [isLoaded, isSignedIn, router]);
+
+  // Show loading state or nothing until auth is loaded
+  if (!isLoaded || !isSignedIn) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-venice-blue"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -47,6 +66,7 @@ export default function DashboardLayout({
                 <Link
                   href="/dashboard"
                   className="group flex items-center px-2 py-2 text-sm font-medium rounded-md text-venice-blue bg-venice-light"
+                  onClick={() => setSidebarOpen(false)}
                 >
                   <HomeIcon className="mr-3 flex-shrink-0 h-6 w-6" aria-hidden="true" />
                   Applications
@@ -54,6 +74,7 @@ export default function DashboardLayout({
                 <Link
                   href="/dashboard/analytics"
                   className="group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                  onClick={() => setSidebarOpen(false)}
                 >
                   <ChartBarIcon className="mr-3 flex-shrink-0 h-6 w-6" aria-hidden="true" />
                   Analytics
@@ -61,6 +82,7 @@ export default function DashboardLayout({
                 <Link
                   href="/dashboard/profile"
                   className="group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                  onClick={() => setSidebarOpen(false)}
                 >
                   <UserIcon className="mr-3 flex-shrink-0 h-6 w-6" aria-hidden="true" />
                   Profile
@@ -68,6 +90,7 @@ export default function DashboardLayout({
                 <Link
                   href="/dashboard/settings"
                   className="group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                  onClick={() => setSidebarOpen(false)}
                 >
                   <CogIcon className="mr-3 flex-shrink-0 h-6 w-6" aria-hidden="true" />
                   Settings
@@ -121,9 +144,17 @@ export default function DashboardLayout({
           <div className="flex-shrink-0 flex border-t border-gray-200 p-4">
             <div className="flex-shrink-0 w-full group block">
               <div className="flex items-center">
+                <div>
+                  <UserButton afterSignOutUrl="/" />
+                </div>
                 <div className="ml-3">
-                  <p className="text-sm font-medium text-gray-700">User Name</p>
-                  <p className="text-xs font-medium text-gray-500">View profile</p>
+                  <p className="text-sm font-medium text-gray-700">Account</p>
+                  <button 
+                    className="text-xs font-medium text-gray-500 hover:text-venice-blue"
+                    onClick={() => router.push('/dashboard/profile')}
+                  >
+                    View profile
+                  </button>
                 </div>
               </div>
             </div>
