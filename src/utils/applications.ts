@@ -14,9 +14,26 @@ const defaultApplications: Application[] = [
 ];
 
 /**
+ * Check if Airtable is configured
+ */
+const isAirtableConfigured = (): boolean => {
+  return !!(
+    typeof process !== 'undefined' && 
+    process.env.AIRTABLE_API_KEY && 
+    process.env.AIRTABLE_BASE_ID
+  );
+};
+
+/**
  * Get applications from Airtable or fallback to default applications
  */
 export async function getApplications(): Promise<Application[]> {
+  // If Airtable is not configured, return default applications
+  if (!isAirtableConfigured()) {
+    console.log('Airtable not configured, using default applications');
+    return defaultApplications;
+  }
+  
   try {
     // Try to get applications from Airtable
     const airtableApps = await getAirtableApplications();
@@ -42,11 +59,20 @@ export async function getApplications(): Promise<Application[]> {
 }
 
 /**
- * Add a new application
+ * Add a new application (mock function for now)
  */
 export async function addApplication(application: Omit<Application, 'id'>): Promise<Application | null> {
+  // If Airtable is not configured, show message in console but return a mock success
+  if (!isAirtableConfigured()) {
+    console.log('Airtable not configured - application would be added here if it was');
+    return {
+      ...application,
+      id: `app-${Date.now()}`,
+    };
+  }
+  
   // This would integrate with Airtable in production
-  console.log('Adding application', application);
+  console.log('Adding application to Airtable', application);
   
   // For now, just return a mock response
   return {
@@ -56,11 +82,21 @@ export async function addApplication(application: Omit<Application, 'id'>): Prom
 }
 
 /**
- * Update an existing application
+ * Update an existing application (mock function for now)
  */
 export async function updateApplication(id: string, application: Partial<Application>): Promise<Application | null> {
+  // If Airtable is not configured, show message in console but return a mock success
+  if (!isAirtableConfigured()) {
+    console.log('Airtable not configured - application would be updated here if it was');
+    return {
+      ...defaultApplications[0],
+      ...application,
+      id,
+    };
+  }
+  
   // This would integrate with Airtable in production
-  console.log('Updating application', id, application);
+  console.log('Updating application in Airtable', id, application);
   
   // For now, just return a mock response
   return {
@@ -71,11 +107,17 @@ export async function updateApplication(id: string, application: Partial<Applica
 }
 
 /**
- * Delete an application
+ * Delete an application (mock function for now)
  */
 export async function deleteApplication(id: string): Promise<boolean> {
+  // If Airtable is not configured, show message in console but return a mock success
+  if (!isAirtableConfigured()) {
+    console.log('Airtable not configured - application would be deleted here if it was');
+    return true;
+  }
+  
   // This would integrate with Airtable in production
-  console.log('Deleting application', id);
+  console.log('Deleting application from Airtable', id);
   
   // For now, just return success
   return true;
